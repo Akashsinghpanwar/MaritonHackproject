@@ -6,6 +6,11 @@ import gradio as gr
 
 from app.rag import add_files, query, clear_index
 from app.settings import UPLOAD_DIR, DATA_DIR
+from app.tools.distance import distance_nm, eta_days
+from app.tools.laytime import compute_laytime, CP, Event
+from app.tools.weather import forecast_latlon
+import json
+from datetime import datetime
 
 def load_samples():
     sample_dir = DATA_DIR / "sample"
@@ -40,7 +45,7 @@ def reset_index():
     return "Index cleared. Upload or load samples again."
 
 with gr.Blocks(title="Maritime Virtual Assistant") as demo:
-    gr.Markdown("# Maritime Virtual Assistant (RAG + Azure DI)")
+    gr.Markdown("# Maritime Virtual Assistant (RAG + LlamaParse)")
 
     with gr.Tab("Chat"):
         with gr.Row():
@@ -63,34 +68,72 @@ with gr.Blocks(title="Maritime Virtual Assistant") as demo:
             status = gr.Textbox(label="Status")
 
     with gr.Tab("Tools"):
-        gr.Markdown("### Distance / ETA (Simple)")
-        with gr.Row():
-            from_port = gr.Textbox(label="From (lat,lon)", value="1.3521,103.8198  # Singapore")
-            to_port = gr.Textbox(label="To (lat,lon)", value="25.1288,56.3265   # Fujairah")
-            speed = gr.Number(label="Speed (kn)", value=13.0)
-        with gr.Row():
-            calc_btn = gr.Button("Compute Distance/ETA")
-            dist_nm = gr.Textbox(label="Distance (NM)")
-            days = gr.Textbox(label="Days")
-        gr.Markdown("*(Integrate to a richer port DB as needed.)*")
+        with gr.Accordion("Distance / ETA", open=True):
+            gr.Markdown("### Distance / ETA (Simple)")
+            with gr.Row():
+                from_port = gr.Textbox(label="From (lat,lon)", value="1.3521,103.8198  # Singapore")
+                to_port = gr.Textbox(label="To (lat,lon)", value="25.1288,56.3265   # Fujairah")
+                speed = gr.Number(label="Speed (kn)", value=13.0)
+            with gr.Row():
+                dist_calc_btn = gr.Button("Compute Distance/ETA")
+                dist_nm_out = gr.Textbox(label="Distance (NM)")
+                days_out = gr.Textbox(label="Days")
+            gr.Markdown("*(Integrate to a richer port DB as needed.)*")
 
-        def compute_dist_eta(a, b, v):
+        with gr.Accordion("Laytime Calculator", open=False):
+            gr.Markdown("### Laytime Calculator")
+            with gr.Row():
+                laytime_hours_in = gr.Number(label="Laytime (hours)", value=72)
+                demurrage_in = gr.Number(label="Demurrage ($/day)", value=15000)
+                despatch_in = gr.Number(label="Despatch ($/day)", value=7500)
+            with gr.Row():
+                events_in = gr.Textbox(label="Events (JSON list of [start, end, reason, excepted])", lines=5, value='[["2024-01-01 09:00", "2024-01-03 12:00", "Cargo Ops", false]]')
+            with gr.Row():
+                laytime_calc_btn = gr.Button("Calculate Laytime")
+                used_hours_out = gr.Textbox(label="Used Hours")
+                demurrage_out = gr.Textbox(label="Demurrage ($)")
+                despatch_out = gr.Textbox(label="Despatch ($)")
+
+        with gr.Accordion("Weather Forecast", open=False):
+            gr.Markdown("### Weather Forecast (OpenWeather)")
+            with gr.Row():
+                weather_lat_in = gr.Textbox(label="Latitude", value="25.1288")
+                weather_lon_in = gr.Textbox(label="Longitude", value="56.3265")
+            with gr.Row():
+                weather_btn = gr.Button("Get Forecast")
+                weather_out = gr.JSON(label="Forecast")
+
+        def compute_dist_eta_ui(a, b, v):
             try:
                 alat, alon = [float(x.strip()) for x in a.split(",")]
                 blat, blon = [float(x.strip()) for x in b.split(",")]
-                R = 3440.065  # NM
-                from math import radians, sin, cos, asin, sqrt
-                dlat = radians(blat - alat)
-                dlon = radians(blon - alon)
-                lat1 = radians(alat); lat2 = radians(blat)
-                h = sin(dlat/2)**2 + cos(lat1)*cos(lat2)*sin(dlon/2)**2
-                d = 2*R*asin(sqrt(h))
-                tdays = d / (24.0 * float(v))
-                return f"{d:.1f}", f"{tdays:.2f}"
+                dist = distance_nm(alat, alon, blat, blon)
+                tdays = eta_days(dist, float(v))
+                return f"{dist:.1f}", f"{tdays:.2f}"
             except Exception as e:
                 return f"Error: {e}", ""
 
-        calc_btn.click(compute_dist_eta, inputs=[from_port, to_port, speed], outputs=[dist_nm, days])
+        def compute_laytime_ui(laytime_h, demurrage, despatch, events_str):
+            try:
+                cp = CP(laytime_hours=laytime_h, demurrage_per_day=demurrage, despatch_per_day=despatch)
+                events_data = json.loads(events_str)
+                events = [Event(start=datetime.fromisoformat(e[0]), end=datetime.fromisoformat(e[1]), reason=e[2], excepted=e[3]) for e in events_data]
+                used_h, dem, desp = compute_laytime(cp, events)
+                return f"{used_h:.2f}", f"{dem:.2f}", f"{desp:.2f}"
+            except Exception as e:
+                return f"Error: {e}", "", ""
+
+        def get_weather_ui(lat, lon):
+            try:
+                lat, lon = float(lat), float(lon)
+                forecast = forecast_latlon(lat, lon)
+                return forecast
+            except Exception as e:
+                return {"error": str(e)}
+
+        dist_calc_btn.click(compute_dist_eta_ui, inputs=[from_port, to_port, speed], outputs=[dist_nm_out, days_out])
+        laytime_calc_btn.click(compute_laytime_ui, inputs=[laytime_hours_in, demurrage_in, despatch_in, events_in], outputs=[used_hours_out, demurrage_out, despatch_out])
+        weather_btn.click(get_weather_ui, inputs=[weather_lat_in, weather_lon_in], outputs=[weather_out])
 
     ask_btn.click(ask, inputs=[question], outputs=[answer, citations])
     reset_btn.click(reset_index, outputs=[status])
