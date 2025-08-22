@@ -3,9 +3,15 @@ from __future__ import annotations
 import shutil
 from pathlib import Path
 import gradio as gr
+import sys
 
-from app.rag import add_files, query, clear_index
-from app.settings import UPLOAD_DIR, DATA_DIR
+if __package__ in {None, ""}:
+    sys.path.append(str(Path(__file__).resolve().parents[2]))
+    from sami.app.rag import add_files, query, clear_index
+    from sami.app.settings import UPLOAD_DIR, DATA_DIR
+else:
+    from .rag import add_files, query, clear_index
+    from .settings import UPLOAD_DIR, DATA_DIR
 
 def load_samples():
     sample_dir = DATA_DIR / "sample"
