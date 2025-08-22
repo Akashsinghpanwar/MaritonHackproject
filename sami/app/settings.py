@@ -14,7 +14,7 @@ def _clean_key(k: str | None) -> str | None:
 
 OPENAI_API_KEY = _clean_key(os.getenv("OPENAI_API_KEY"))
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
-LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini")
+LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o")
 
 USE_LOCAL_EMBEDDINGS = os.getenv("USE_LOCAL_EMBEDDINGS", "0") == "1"
 USE_LOCAL_LLM = os.getenv("USE_LOCAL_LLM", "0") == "1"
