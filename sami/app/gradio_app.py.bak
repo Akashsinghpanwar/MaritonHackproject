@@ -4,11 +4,11 @@ import shutil
 from pathlib import Path
 import gradio as gr
 
-from app.rag import add_files, query, clear_index
-from app.settings import UPLOAD_DIR, DATA_DIR
-from app.tools.distance import distance_nm, eta_days
-from app.tools.laytime import compute_laytime, CP, Event
-from app.tools.weather import forecast_latlon
+from .rag import add_files, query, clear_index
+from .settings import UPLOAD_DIR, DATA_DIR
+from .tools.distance import distance_nm, eta_days
+from .tools.laytime import compute_laytime, CP, Event
+from .tools.weather import forecast_latlon
 import json
 from datetime import datetime
 

@@ -32,3 +32,7 @@ VECTOR_DIR.mkdir(parents=True, exist_ok=True)
 # LlamaParse toggle/key
 LLAMA_PARSE_ENABLED = os.getenv("LLAMA_PARSE_ENABLED", "1") == "1"
 LLAMA_CLOUD_API_KEY = os.getenv("LLAMA_CLOUD_API_KEY")
+
+# Supabase
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")

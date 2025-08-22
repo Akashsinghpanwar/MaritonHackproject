@@ -4,7 +4,7 @@ import os, shutil
 from pathlib import Path
 from typing import List, Tuple
 
-from app.settings import (
+from .settings import (
     OPENAI_API_KEY, EMBEDDING_MODEL, LLM_MODEL,
     USE_LOCAL_EMBEDDINGS, USE_LOCAL_LLM,
     BASE_DIR, UPLOAD_DIR, VECTOR_DIR, LLAMA_PARSE_ENABLED,  # <- LlamaParse flag
@@ -114,7 +114,7 @@ def get_index() -> VectorStoreIndex:
 def add_files(file_paths: List[str]) -> Tuple[int, List[str]]:
     """Copy files into uploads and (for PDFs) run LlamaParse to produce .md, then (re)index."""
     copied: List[str] = []
-    from app.llama_parser import parse_with_llamaparse  # <- LlamaParse, not Azure
+    from .llama_parser import parse_with_llamaparse  # <- LlamaParse, not Azure
 
     for src in file_paths:
         src_path = Path(src)
