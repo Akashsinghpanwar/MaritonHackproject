@@ -1,53 +1,147 @@
-# Maritime Virtual Assistant (RAG + Azure Document Intelligence)
+# Maritime Virtual Assistant
 
-This is a production-ready minimal app that:
-- Parses PDFs/images with **LlamaParse** (from LlamaCloud).
-- Builds a **RAG** index with **LlamaIndex** (OpenAI or local embeddings).
-- Lets you **chat** with your documents and get **citations**.
-- Provides tools for **Distance/ETA**, **Laytime**, and **Weather**.
-- Ships with **sample CP + SOF** to test immediately.
+This is a production-ready, minimal application that demonstrates a powerful RAG (Retrieval-Augmented Generation) pipeline for the maritime industry. It allows users to upload documents like Charter Parties and Statements of Facts, and then ask questions in natural language.
 
-## 1) Local Development Setup
+The application is built with a modern Python stack and features a clean, responsive web interface.
 
-### API Keys & Supabase
-This application requires API keys and Supabase credentials.
-1.  **Supabase:** Create a new project on [Supabase](https://supabase.com/). In your project settings, find your API URL and `anon` key.
-2.  **API Keys:** You will also need API keys for OpenAI, LlamaParse, and OpenWeather.
-3.  **Environment File:** Copy the `.env.example` file to `.env` and fill in all the required keys and the Supabase URL.
+## Features
 
-### Python
-- Recommended: Python 3.11
-- Create a virtual environment and install packages:
-  ```bash
-  python -m venv venv
-  source venv/bin/activate
-  pip install -U -r requirements.txt
-  ```
-- Run the application:
-  ```bash
-  uvicorn main:app --reload
-  ```
-- The application will be available at `http://127.0.0.1:8000`.
+-   **Document Q&A:** Chat with your uploaded documents. The assistant can answer questions about contract terms, laytime clauses, demurrage, and more.
+-   **Citations:** Every answer is backed by citations from the source documents, ensuring traceability and trust.
+-   **Smart Ingestion:** Supports PDF, Markdown, and text files. It uses LlamaParse to intelligently extract content from PDFs, ensuring high-quality data for the RAG pipeline.
+-   **Voyage Tools API:** Includes a backend API with tools for calculating voyage distance/ETA, computing laytime, and fetching weather forecasts.
+-   **Ready for Deployment:** Comes with a `Dockerfile` and detailed instructions for deploying to cloud services like Render.
 
-## 2) Deployment on Render.com
+## How it Works
 
-This application is ready to be deployed as a Docker container on Render.com.
+The application follows a classic client-server architecture with a decoupled frontend and a powerful backend API.
 
-### Supabase Table
-Before deploying, you need to create a table in your Supabase database. Go to the "Table Editor" in your Supabase project and create a new table named `documents` with the following columns:
-- `id` (int8, is identity, primary key)
-- `created_at` (timestamptz, default now())
-- `filename` (text)
-Make sure to enable RLS (Row Level Security) for the table if you want to control access. For a simple setup, you can leave it disabled.
+```
++-----------------+      +------------------------------+
+|   Frontend      |      |        Backend (API)         |
+| (static HTML,   |----->| (FastAPI, LlamaIndex, Tools) |
+|  JS, CSS)       |      +------------------------------+
++-----------------+
+```
 
-### Deploying to Render
-1.  **Push to GitHub:** Make sure your code is pushed to a GitHub repository.
+### Frontend
+
+The frontend is a simple, single-page application built with HTML, CSS, and vanilla JavaScript. It is located in the `static/` directory.
+
+-   It provides a user interface for uploading files and asking questions.
+-   It communicates with the backend via asynchronous `fetch` requests to the API endpoints.
+-   All user interaction logic is contained within `static/index.html`.
+
+### Backend
+
+The backend is a FastAPI application that exposes several endpoints to serve the application.
+
+-   `GET /`: Serves the main `index.html` frontend.
+-   `POST /upload`: Handles file uploads, passes them to the RAG pipeline for ingestion, and stores metadata in Supabase.
+-   `POST /chat`: Receives a user's question, queries the RAG pipeline, and returns the answer with citations.
+-   `POST /tools/distance`: Calculates voyage distance and ETA.
+-   `POST /tools/laytime`: Computes laytime based on provided events.
+-   `GET /tools/weather`: Fetches a weather forecast for a given latitude and longitude.
+
+### RAG Pipeline
+
+The core of the application is the RAG pipeline in `sami/app/rag.py`, built using the LlamaIndex framework.
+
+1.  **Ingestion (`add_files`):** When files are uploaded, they are processed. If LlamaParse is enabled, PDFs are sent to the LlamaCloud service to be converted into high-quality Markdown.
+2.  **Indexing (`get_index`):** The application uses `SimpleDirectoryReader` to read the processed `.md` and `.txt` files. It then builds a `VectorStoreIndex`, which creates numerical representations (embeddings) of the text chunks. This index is persisted in the `sami/app/storage/vector` directory to avoid costly re-indexing.
+3.  **Querying (`query`):** When a user asks a question, the query is converted into an embedding. The system performs a semantic search on the vector index to find the most relevant text chunks from the documents. These chunks, along with the original question, are then passed to a Large Language Model (LLM) like GPT-4o to synthesize a final, human-readable answer.
+
+## Setup and Installation
+
+### Prerequisites
+
+-   Python 3.11+
+-   Docker (for containerized deployment)
+-   A free [Supabase](https://supabase.com/) account for document metadata storage.
+-   API keys for:
+    -   [OpenAI](https://platform.openai.com/api-keys)
+    -   [LlamaCloud](https://cloud.llamaindex.ai/) (for LlamaParse)
+    -   [OpenWeather](https://openweathermap.org/api) (specifically for the **One Call API 3.0**)
+
+### Configuration
+
+The application is configured using environment variables.
+
+1.  Create a file named `.env` in the root directory of the project.
+2.  Add the following variables to the file, replacing the placeholder values with your actual credentials:
+
+    ```env
+    # OpenAI API Key for embeddings and LLM
+    OPENAI_API_KEY="sk-..."
+
+    # LlamaCloud API Key for parsing PDFs
+    LLAMA_CLOUD_API_KEY="..."
+
+    # OpenWeather API Key for the weather tool
+    # Note: Must be subscribed to the "One Call API 3.0" plan
+    WEATHER_API_KEY="..."
+
+    # Supabase credentials for storing document filenames
+    SUPABASE_URL="https://<your-project-ref>.supabase.co"
+    SUPABASE_KEY="<your-supabase-anon-key>"
+    ```
+
+### Local Development
+
+1.  **Create a virtual environment:**
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+2.  **Install dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+3.  **Run the application:**
+    ```bash
+    uvicorn main:app --reload
+    ```
+4.  The application will be available at `http://127.0.0.1:8000`.
+
+## Deployment
+
+This application is ready to be deployed as a Docker container. The following instructions are for Render.com.
+
+### 1. Supabase Table Setup
+
+Before deploying, you need to create a table in your Supabase project to store document metadata.
+
+1.  Go to the "Table Editor" in your Supabase project dashboard.
+2.  Create a new table named `documents`.
+3.  Define the following columns:
+    -   `id` (int8, is identity, primary key)
+    -   `created_at` (timestamptz, default: `now()`)
+    -   `filename` (text)
+4.  Row Level Security (RLS) can be left disabled for simple use cases.
+
+### 2. Deploying to Render
+
+1.  **Push to GitHub:** Ensure your project code, including the `Dockerfile`, is pushed to a GitHub repository.
 2.  **Create a New Web Service:** On the Render dashboard, click "New +" and select "Web Service".
-3.  **Connect Repository:** Connect your GitHub account and select the repository for this project.
+3.  **Connect Repository:** Connect your GitHub account and select the project repository.
 4.  **Settings:**
     -   **Name:** Give your service a name (e.g., `maritime-assistant`).
     -   **Runtime:** Select `Docker`. Render will automatically detect the `Dockerfile`.
     -   **Region:** Choose a region close to you.
-    -   **Branch:** Select the branch you want to deploy (e.g., `main`).
-5.  **Environment Variables:** Under "Advanced", go to the "Environment" section. Add all the keys from your `.env` file as environment variables (`OPENAI_API_KEY`, `LLAMA_CLOUD_API_KEY`, `OPENWEATHER_KEY`, `SUPABASE_URL`, `SUPABASE_KEY`).
-6.  **Create Web Service:** Click "Create Web Service". Render will start building and deploying your application. Once it's live, you can access it at the URL provided by Render.
+5.  **Environment Variables:** Under the "Environment" section, add all the keys from your `.env` file (`OPENAI_API_KEY`, `LLAMA_CLOUD_API_KEY`, `WEATHER_API_KEY`, `SUPABASE_URL`, `SUPABASE_KEY`).
+6.  **Create Web Service:** Click "Create Web Service". Render will build and deploy your application. Once live, you can access it at the public URL provided by Render.
+
+## Future Possibilities
+
+This application provides a strong foundation that can be extended in many ways:
+
+-   **Tool-Integrated Chat:** The backend could be enhanced to use a "function calling" or "agentic" model. This would allow the LLM to intelligently decide when to use the `distance`, `laytime`, or `weather` tools to answer a question, feeding the tool's output back into its context to provide more accurate, data-driven answers.
+-   **Interactive Tool UI:** The frontend could be updated to include forms for using the voyage tools directly, allowing users to perform manual calculations without having to phrase a question for the chat.
+-   **Advanced Agentic Behavior:** The RAG pipeline could be converted into a more complex LlamaIndex agent that can perform multi-step reasoning across documents and tools.
+-   **Support for More Document Types:** The ingestion pipeline could be expanded to support other common file formats like `.docx`, `.xml`, or `.csv`.
+
+***
+
+### A Note from the Developer
+
+I got to know about this project one day before the submission deadline. This is all I could do in one day.
