@@ -1,4 +1,11 @@
-# Maritime Virtual Assistant
+
+Hi, I’m Samiksha Bagri.
+This was my very first hackathon and it has been such a valuable experience. A big thanks to ChatGPT, Anthropic, Google, Jules, and GPT Codex for enabling me to build and learn throughout this project.
+
+By participating in this hackathon, I gained so much knowledge, hands-on experience, and confidence.
+Thank you to Maritime for organizing this opportunity—it was truly a great experience!💫
+
+⁹# Maritime Virtual Assistant
 
 This is a production-ready, minimal application that demonstrates a powerful RAG (Retrieval-Augmented Generation) pipeline for the maritime industry. It allows users to upload documents like Charter Parties and Statements of Facts, and then ask questions in natural language.
 
@@ -195,7 +202,7 @@ This application provides a strong foundation that can be extended in many ways:
 
 ***
 
-### A Note from the Developer
+### A Note from the samiksha
 
 I got to know about this project one day before the submission deadline. This is all I could do in one day.
 > ### A quick note on stack & budget 💙
