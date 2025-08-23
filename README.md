@@ -3,6 +3,10 @@
 This is a production-ready, minimal application that demonstrates a powerful RAG (Retrieval-Augmented Generation) pipeline for the maritime industry. It allows users to upload documents like Charter Parties and Statements of Facts, and then ask questions in natural language.
 
  Maritime Virtual Assistant, a Retrieval-Augmented Generation (RAG) application designed for the maritime industry. This system allows users to upload and query documents like charter parties using natural language, receiving answers with traceable citations. Beyond document interaction, the assistant integrates a backend API offering voyage tools for calculating distances, estimating arrival times, computing laytime, and fetching weather forecasts. The architecture consists of a decoupled frontend and a powerful backend, with a RAG pipeline leveraging LlamaIndex for intelligent document ingestion, indexing, and querying using Large Language Models. The document also provides detailed instructions for local development and cloud deployment using Docker and Render.com, highlighting prerequisites and configuration for various API keys.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="NotebookLM Mind Map (2).png">
+  <img src="NotebookLM Mind Map (2).png" alt="Maritime VA hero" width="1000">
+</picture>
 
 ## Features
 
