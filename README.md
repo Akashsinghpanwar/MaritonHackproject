@@ -7,6 +7,55 @@ This is a production-ready, minimal application that demonstrates a powerful RAG
   <source media="(prefers-color-scheme: dark)" srcset="NotebookLM Mind Map (2).png">
   <img src="NotebookLM Mind Map (2).png" alt="Maritime VA hero" width="1000">
 </picture>
+<h1 align="center">Maritime Virtual Assistant ⚓️🤖</h1>
+<p align="center">
+  AI that understands charter parties, statements of facts, and voyage docs — ask questions and get cited answers.
+</p>
+
+<p align="center">
+  <a href="https://finalefforts.onrender.com/">
+    <img alt="Live Demo" src="https://img.shields.io/badge/Live%20Demo-Open%20App-1b72ff?style=for-the-badge&logo=googlechrome&logoColor=white">
+  </a>
+  <a href="#">
+    <img alt="FastAPI" src="https://img.shields.io/badge/FastAPI-🚀-16a34a?style=for-the-badge">
+  </a>
+  <a href="#">
+    <img alt="Python" src="https://img.shields.io/badge/Python-3.12-3670a0?style=for-the-badge&logo=python&logoColor=white">
+  </a>
+</p>
+
+---
+
+## ✨ What you can do
+- 📄 **Upload** a PDF/image/markdown doc (charter party, SOF, etc.)
+- 💬 **Ask** natural questions — get concise answers
+- 📎 **Citations** back to the source (so you can verify)
+
+## 🚢 Try these right now
+1. Click **Live Demo** above.
+2. Upload any maritime doc (CP/SOF).
+3. Paste a prompt:
+   - “When does **laytime start** according to this charter party?” ⏱️  
+   - “From this **SOF**, calculate **total laytime counted vs. excluded**.” 📘  
+   - “What’s the **demurrage rate** and **despatch** terms?” 💵  
+   - “Summarize the **governing law & arbitration** clause.” ⚖️
+
+## 🌟 Why it stands out
+- ⚡ **Fast answers** with doc awareness  
+- 🧭 Designed for **shipping workflows** (NOR, laytime, demurrage)  
+- 🖥️ Clean, responsive UI with a fun vibe ✨
+
+---
+
+<!-- Optional: add a screenshot or short GIF to boost engagement -->
+<!-- Replace assets/demo.png with your actual path -->
+<p align="center">
+  <img src="assets/demo.png" alt="Maritime VA demo" width="800">
+</p>
+
+<p align="center">
+  If you find this useful, ⭐ the repo — it helps a ton! 🙏
+</p>
 
 ## Features
 
