@@ -149,3 +149,17 @@ This application provides a strong foundation that can be extended in many ways:
 ### A Note from the Developer
 
 I got to know about this project one day before the submission deadline. This is all I could do in one day.
+> ### A quick note on stack & budget 💙
+> I would have loved to use Azure Document Intelligence and Azure Database for this project, but I’m currently constrained to free tiers. To ship a working demo, I used:
+>
+> - **Supabase** (free tier) for the database  
+> - **Render** (free tier) to host the web app live: https://finalefforts.onrender.com/  
+> - **RAG with LlamaIndex** and other open-source components
+> This app is hosted on Render’s free plan. After periods of inactivity, the service can go into “sleep” mode (cold start).  
+> If the webpage doesn’t load at first, give it a little time and refresh — it will wake up and start working automatically.
+> This is a **demo**—a proof of what I can build with limited resources. With proper support/budget, I can make this agent **far more intelligent**, scalable, and production-ready (better OCR pipelines, Azure DI integration, stronger retrieval, evals, monitoring, etc.).
+>
+> What matters is a **chance** and **trust**. Give me that, and I’ll deliver something great. 🚀🙏
+> > **Heads-up (Render free tier) 💤**
+>
+
