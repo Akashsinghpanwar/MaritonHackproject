@@ -1,5 +1,5 @@
 
-Hi, I’m Samiksha Bagri.
+Hi, .
 This was my very first hackathon and it has been such a valuable experience. A big thanks to ChatGPT, Anthropic, Google, Jules, and GPT Codex for enabling me to build and learn throughout this project.
 
 By participating in this hackathon, I gained so much knowledge, hands-on experience, and confidence.
