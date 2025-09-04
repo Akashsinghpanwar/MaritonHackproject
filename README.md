@@ -1,9 +1,7 @@
 
 Hi, .
-This was my very first hackathon and it has been such a valuable experience. A big thanks to ChatGPT, Anthropic, Google, Jules, and GPT Codex for enabling me to build and learn throughout this project.
 
-By participating in this hackathon, I gained so much knowledge, hands-on experience, and confidence.
-Thank you to Maritime for organizing this opportunity—it was truly a great experience!💫
+
 
 ⁹# Maritime Virtual Assistant
 
